@@ -38,6 +38,8 @@ import 'rc-dock/dist/rc-dock.css'
 import { SlidersH } from '@styled-icons/fa-solid/SlidersH'
 import { PanelDragContainer, PanelIcon, PanelTitle } from './layout/Panel'
 import { ProjectDiagram } from '@styled-icons/fa-solid'
+import { Archive } from '@styled-icons/fa-solid'
+import { FileBrowserSourcePanel } from './assets/FileBrowserSourcePanel'
 
 /**
  * StyledEditorContainer component is used as root element of new project page.
@@ -913,6 +915,16 @@ class EditorContainer extends Component<EditorContainerProps, EditorContainerSta
                     id: 'assetsPanel',
                     title: 'Elements',
                     content: <AssetsPanel />
+                  },
+                  {
+                    id: 'fileBrowserPanel',
+                    title: (
+                      <PanelDragContainer>
+                        <PanelIcon as={Archive} size={12} />
+                        <PanelTitle>File Browser</PanelTitle>
+                      </PanelDragContainer>
+                    ),
+                    content: <FileBrowserSourcePanel />
                   }
                 ]
               }
