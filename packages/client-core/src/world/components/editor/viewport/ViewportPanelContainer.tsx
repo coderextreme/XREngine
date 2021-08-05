@@ -304,7 +304,7 @@ export function ViewportPanelContainer() {
     (assets) => {
       Promise.all(
         assets.map(({ url, name, id }) => {
-          editor.addMedia(url, name, id)
+          editor.addMedia({ url, name, id })
         })
       ).catch((err) => {
         editor.emit('error', err)

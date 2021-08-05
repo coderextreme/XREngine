@@ -2717,7 +2717,7 @@ export class Editor extends EventEmitter {
 
   async addMedia(params, parent, before) {
     let contentType = ''
-    const { url } = params
+    const { url, name, id } = params
     const { hostname } = new URL(url)
 
     try {
@@ -2760,7 +2760,10 @@ export class Editor extends EventEmitter {
       node.href = url
       this.addObject(node, parent, before)
     }
-    this.api.filesToUpload[url] = url
+    this.api.filesToUpload[name] = {
+      file_id: id,
+      file_token: 'fileToken'
+    }
     return node
   }
 
