@@ -2707,16 +2707,17 @@ export class Editor extends EventEmitter {
     } else if ((data = event.clipboardData.getData('text')) !== '') {
       try {
         const url = new URL(data)
-        this.addMedia(url.href, null, null).catch((error) => this.emit('error', error))
+
+        this.addMedia({ url: url.href }, null, null).catch((error) => this.emit('error', error))
       } catch (e) {
         console.warn('Clipboard contents did not contain a valid url')
       }
     }
   }
 
-  async addMedia(url, parent, before) {
+  async addMedia(params, parent, before) {
     let contentType = ''
-
+    const { url } = params
     const { hostname } = new URL(url)
 
     try {
@@ -2759,7 +2760,7 @@ export class Editor extends EventEmitter {
       node.href = url
       this.addObject(node, parent, before)
     }
-
+    this.api.filesToUpload[url] = url
     return node
   }
 

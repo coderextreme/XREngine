@@ -303,8 +303,8 @@ export function ViewportPanelContainer() {
   const onAfterUploadAssets = useCallback(
     (assets) => {
       Promise.all(
-        assets.map(({ url }) => {
-          editor.addMedia(url)
+        assets.map(({ url, name, id }) => {
+          editor.addMedia(url, name, id)
         })
       ).catch((err) => {
         editor.emit('error', err)

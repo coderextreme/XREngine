@@ -1146,7 +1146,7 @@ export class Api extends EventEmitter {
       file_id: assetFileId,
       meta: { access_token: assetAccessToken, expected_content_type: expectedContentType },
       origin: origin
-    } = (await this.upload(file, onProgress, signal)) as any
+    } = (await this.upload(file, onProgress, signal, 'uploadedFile', this.currentProjectID)) as any
 
     const delta = Date.now() - this.lastUploadAssetRequest
 
