@@ -1,0 +1,52 @@
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+ }
+
+ .gameoff{
+    .wallet{
+        position: absolute;
+        left: 24px;
+        top:41px;
+        cursor: pointer;
+
+    }
+    .buttonn{
+        position:absolute;
+        top:43px;
+        left:50%; cursor: pointer;
+
+    }
+
+    .microphonered{
+        position: absolute;
+        top:50%;
+        right: -10px;
+        transform: translate(-50%,-50%);
+        cursor: pointer;
+    }
+    .wing{
+        position: absolute;
+        left:50%;
+        top:550.8px;
+        cursor: pointer;
+       
+        
+    }
+
+ }
+
+ @media (max-width:375px) {
+
+    .wallet {
+        transform: translate(-20%, 0);
+    }
+     .buttonn {
+        transform: translate(-50%, 0);
+     }
+   .wing {
+    
+      transform: translate(-50%, 140px);
+   }
+ }

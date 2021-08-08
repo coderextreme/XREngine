@@ -39,7 +39,7 @@ const ProfileEditing = () =>{
                 <input className={styles.btninput} placeholder="Where would you like to go?"/>
                  <img className={styles.iconsearch}src={Groupp} alt="groupp"></img>
                 </div>
-                
+
                 <div className={styles.map}>
                 <img src={Glasss} alt="glasss"></img>
                 <img  className={styles.widget}src={Widgget} alt="widgget"></img>
