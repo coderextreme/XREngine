@@ -56,12 +56,13 @@ class FileBrowserSourcePanel extends Component {
   renderUploadFilesTypes(file) {
     const type = file.type
 
-    switch (type) {
-      case UploadFileType.Image:
-        return <ImageMediaGridItem src={file.url} onClick={this.onClickItem} label={file.name} {...file} />
+    switch (
+      type
+      // case (UploadFileType.Image):
+      //   return <ImageMediaGridItem src={file.url} onClick={this.onClickItem} label={file.name} {...file} />
 
-      case UploadFileType.Vedio:
-        return <VideoMediaGridItem src={file.url} onClick={this.onClickItem} label={file.name} {...file} />
+      // case(UploadFileType.Vedio):
+      //   return <VideoMediaGridItem src={file.url} onClick={this.onClickItem} label={file.name} {...file} />
 
       // case(item.iconComponent) {
       //   //setting content as IconMediaGridItem component if item contains iconComponent
@@ -74,67 +75,20 @@ class FileBrowserSourcePanel extends Component {
       //   content = <ImageMediaGridItem onClick={onClickItem} label={item.label} {...rest} />
       // }
 
-      case UploadFileType.Audio:
-        return <AudioPreview src={file.url} />
+      // case(UploadFileType.Audio):
+      //   return <AudioPreview src={file.url}/>
+    ) {
     }
-
-    switch (type) {
-      case UploadFileType.Image:
-        console.log('Image Type Detected')
-        break
-      default:
-        console.log('File Type Error')
-        break
-    }
-    let lastId = 0
-    //const uniqueId = useRef(`AssetGrid${lastId}`)
-
-    return (
-      <MediaGrid>
-        {/* {Object.keys(files).map((item) => (
-      <MemoAssetGridItem
-        key={files[item].file_name}
-        tooltipComponent={null}
-        disableTooltip={false}
-        contextMenuId={null}
-        item={item}
-        selected={null}
-        onClick={null}
-      />
-    ))} */}
-        {<div>This is the FileBrowser panel Component</div>}
-        {<div>This is the FileBrowser panel Component 1</div>}
-        {<div>This is the FileBrowser panel Component 2</div>}
-        {<div>This is the FileBrowser panel Component 3</div>}
-        {<div>This is the FileBrowser panel Component 4</div>}
-      </MediaGrid>
-    )
-
-    //{isLoading && <LoadingItem>{t('editor:layout.assetGrid.loading')}</LoadingItem>}
-
-    {
-      /* <Column flex>
-      {SourceComponent && (
-        <SourceComponent
-          key={selectedSource.id}
-          source={selectedSource}
-          editor={editor}
-          savedState={savedState}
-          setSavedState={setSavedState}
-        />
-      )}
-    </Column> */
-    }
+    return <div></div>
   }
   //rendering editor views for customization of element properties
   render() {
     const editor = (this.props as any).editor
     const lis = (editor.api as Api).filesToUpload
-    console.log('List Present is:' + JSON.stringify(lis))
 
     return (
       <div>
-        This is the File Browser Panel <div>{this.renderUploadFiles(lis)}</div>
+        This is the File Browser Panel <div>{this.renderUploadFilesTypes(lis)}</div>
       </div>
     )
   }
