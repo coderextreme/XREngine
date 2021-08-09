@@ -1,46 +1,49 @@
-import _ from 'lodash'
 import { detect, detectOS } from 'detect-browser'
+import _ from 'lodash'
 import { AudioListener, BufferGeometry, Euler, Mesh, PerspectiveCamera, Quaternion, Scene } from 'three'
-import { acceleratedRaycast, disposeBoundsTree, computeBoundsTree } from 'three-mesh-bvh'
+import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh'
+import { loadDRACODecoder } from './assets/loaders/gltf/NodeDracoLoader'
+import { AudioSystem } from './audio/systems/AudioSystem'
 import { PositionalAudioSystem } from './audio/systems/PositionalAudioSystem'
+import { AnimationSystem } from './avatar/AnimationSystem'
+import { AvatarControllerSystem } from './avatar/AvatarControllerSystem'
+import { ClientAvatarSpawnSystem } from './avatar/ClientAvatarSpawnSystem'
+import { ServerAvatarSpawnSystem, SpawnPoints } from './avatar/ServerAvatarSpawnSystem'
+import { setupBotHooks } from './bot/functions/botHookFunctions'
 import { CameraSystem } from './camera/systems/CameraSystem'
-import { CharacterControllerSystem } from './character/CharacterControllerSystem'
 import { now } from './common/functions/now'
+import { Timer } from './common/functions/Timer'
 import { DebugHelpersSystem } from './debug/systems/DebugHelpersSystem'
-import { DefaultInitializationOptions, InitializeOptions, EngineSystemPresets } from './initializationOptions'
 import { Engine } from './ecs/classes/Engine'
 import { EngineEvents } from './ecs/classes/EngineEvents'
+import { ActiveSystems } from './ecs/classes/System'
+import { execute, reset } from './ecs/functions/EngineFunctions'
 import { getSystem, registerSystem } from './ecs/functions/SystemFunctions'
+import { SystemUpdateType } from './ecs/functions/SystemUpdateType'
 import { GameManagerSystem } from './game/systems/GameManagerSystem'
+import { DefaultInitializationOptions, EngineSystemPresets, InitializeOptions } from './initializationOptions'
+import { addClientInputListeners, removeClientInputListeners } from './input/functions/clientInputListeners'
 import { ClientInputSystem } from './input/systems/ClientInputSystem'
+import { EquippableSystem } from './interaction/systems/EquippableSystem'
 import { InteractiveSystem } from './interaction/systems/InteractiveSystem'
+import { AutopilotSystem } from './navigation/systems/AutopilotSystem'
 import { Network } from './networking/classes/Network'
 import { ClientNetworkStateSystem } from './networking/systems/ClientNetworkStateSystem'
 import { MediaStreamSystem } from './networking/systems/MediaStreamSystem'
+import { ServerNetworkIncomingSystem } from './networking/systems/ServerNetworkIncomingSystem'
+import { ServerNetworkOutgoingSystem } from './networking/systems/ServerNetworkOutgoingSystem'
 import { ParticleSystem } from './particles/systems/ParticleSystem'
+import { InterpolationSystem } from './physics/systems/InterpolationSystem'
 import { PhysicsSystem } from './physics/systems/PhysicsSystem'
 import { configCanvasElement } from './renderer/functions/canvas'
 import { HighlightSystem } from './renderer/HighlightSystem'
-import { TransformSystem } from './transform/systems/TransformSystem'
-import { UISystem } from './xrui/systems/UISystem'
-import { XRSystem } from './xr/systems/XRSystem'
+import { VisibilitySystem } from './renderer/VisibleSystem'
 import { WebGLRendererSystem } from './renderer/WebGLRendererSystem'
-import { Timer } from './common/functions/Timer'
-import { execute, reset } from './ecs/functions/EngineFunctions'
-import { SystemUpdateType } from './ecs/functions/SystemUpdateType'
-import { ServerNetworkIncomingSystem } from './networking/systems/ServerNetworkIncomingSystem'
-import { ServerNetworkOutgoingSystem } from './networking/systems/ServerNetworkOutgoingSystem'
-import { ServerSpawnSystem } from './scene/systems/ServerSpawnSystem'
 import { SceneObjectSystem } from './scene/systems/SceneObjectSystem'
-import { ActiveSystems } from './ecs/classes/System'
-import { AudioSystem } from './audio/systems/AudioSystem'
-import { setupBotHooks } from './bot/functions/botHookFunctions'
-import { AnimationSystem } from './character/AnimationSystem'
-import { InterpolationSystem } from './physics/systems/InterpolationSystem'
+import { TransformSystem } from './transform/systems/TransformSystem'
+import { XRSystem } from './xr/systems/XRSystem'
 import { FontManager } from './xrui/classes/FontManager'
-import { EquippableSystem } from './interaction/systems/EquippableSystem'
-import { AutopilotSystem } from './navigation/systems/AutopilotSystem'
-import { addClientInputListeners, removeClientInputListeners } from './input/functions/clientInputListeners'
+import { UISystem } from './xrui/systems/UISystem'
 
 // @ts-ignore
 Quaternion.prototype.toJSON = function () {
@@ -131,6 +134,10 @@ const configureServer = async (options: Required<InitializeOptions>) => {
     Engine.hasJoinedWorld = true
   })
 
+  await loadDRACODecoder()
+
+  new SpawnPoints()
+
   registerServerSystems(options)
 }
 
@@ -148,7 +155,7 @@ const registerClientSystems = (options: Required<InitializeOptions>, canvas: HTM
 
   // Input Systems
   registerSystem(SystemUpdateType.Fixed, UISystem)
-  registerSystem(SystemUpdateType.Fixed, CharacterControllerSystem)
+  registerSystem(SystemUpdateType.Fixed, AvatarControllerSystem)
   registerSystem(SystemUpdateType.Fixed, AnimationSystem)
   registerSystem(SystemUpdateType.Fixed, AutopilotSystem)
 
@@ -169,12 +176,14 @@ const registerClientSystems = (options: Required<InitializeOptions>, canvas: HTM
   registerSystem(SystemUpdateType.Fixed, AudioSystem)
   registerSystem(SystemUpdateType.Fixed, PositionalAudioSystem)
   registerSystem(SystemUpdateType.Fixed, SceneObjectSystem)
+  registerSystem(SystemUpdateType.Fixed, ClientAvatarSpawnSystem)
 
   // Free systems
   registerSystem(SystemUpdateType.Free, XRSystem)
   registerSystem(SystemUpdateType.Free, CameraSystem)
   registerSystem(SystemUpdateType.Free, WebGLRendererSystem, { canvas })
   registerSystem(SystemUpdateType.Free, HighlightSystem)
+  registerSystem(SystemUpdateType.Free, VisibilitySystem)
 }
 
 const registerEditorSystems = (options: Required<InitializeOptions>) => {
@@ -197,11 +206,10 @@ const registerServerSystems = (options: Required<InitializeOptions>) => {
   registerSystem(SystemUpdateType.Fixed, MediaStreamSystem)
 
   // Input Systems
-  registerSystem(SystemUpdateType.Fixed, CharacterControllerSystem)
+  registerSystem(SystemUpdateType.Fixed, AvatarControllerSystem)
   registerSystem(SystemUpdateType.Fixed, AutopilotSystem)
 
   // Scene Systems
-  registerSystem(SystemUpdateType.Fixed, InteractiveSystem)
   registerSystem(SystemUpdateType.Fixed, EquippableSystem)
   registerSystem(SystemUpdateType.Fixed, GameManagerSystem)
   registerSystem(SystemUpdateType.Fixed, TransformSystem)
@@ -211,7 +219,7 @@ const registerServerSystems = (options: Required<InitializeOptions>) => {
   })
 
   // Miscellaneous Systems
-  registerSystem(SystemUpdateType.Fixed, ServerSpawnSystem)
+  registerSystem(SystemUpdateType.Fixed, ServerAvatarSpawnSystem)
 
   // Network Outgoing Systems
   registerSystem(SystemUpdateType.Fixed, ServerNetworkOutgoingSystem) // last
@@ -220,7 +228,6 @@ const registerServerSystems = (options: Required<InitializeOptions>) => {
 export const initializeEngine = async (initOptions: InitializeOptions = {}): Promise<void> => {
   const options: Required<InitializeOptions> = _.defaultsDeep({}, initOptions, DefaultInitializationOptions)
   Engine.initOptions = options
-  Engine.gameModes = options.gameModes
   Engine.offlineMode = typeof options.networking.schema === 'undefined'
   Engine.publicPath = options.publicPath
   Engine.lastTime = now() / 1000
