@@ -89,7 +89,7 @@ import {
 import { Config } from '../../../helper'
 import Api from './Api'
 import AssetManifestSource from './assets/AssetManifestSource'
-import { UploadFileTypes } from './assets/FileBrowserSourcePanel'
+import { UploadFileType } from './assets/FileBrowserSourcePanel'
 import { loadEnvironmentMap } from './EnvironmentMap'
 
 const tempMatrix1 = new Matrix4()
@@ -2728,43 +2728,43 @@ export class Editor extends EventEmitter {
     }
 
     let node
-    let uploadFileType: UploadFileTypes = null
+    let uploadFileType: UploadFileType = null
     if (contentType.startsWith('model/gltf')) {
       node = new ModelNode(this)
       this.getSpawnPosition(node.position)
       this.addObject(node, parent, before)
       node.initialScale = 'fit'
-      uploadFileType = UploadFileTypes.Image
+      uploadFileType = UploadFileType.Image
       await node.load(url)
     } else if (contentType.startsWith('video/') || hostname === 'www.twitch.tv') {
       node = new VideoNode(this)
       this.getSpawnPosition(node.position)
       this.addObject(node, parent, before)
-      uploadFileType = UploadFileTypes.Vedio
+      uploadFileType = UploadFileType.Vedio
       await node.load(url)
     } else if (contentType.startsWith('image/')) {
       node = new ImageNode(this)
       this.getSpawnPosition(node.position)
       this.addObject(node, parent, before)
-      uploadFileType = UploadFileTypes.Image
+      uploadFileType = UploadFileType.Image
       await node.load(url)
     } else if (contentType.startsWith('audio/')) {
       node = new AudioNode(this)
       this.getSpawnPosition(node.position)
       this.addObject(node, parent, before)
-      uploadFileType = UploadFileTypes.Audio
+      uploadFileType = UploadFileType.Audio
       await node.load(url)
     } else if (url.contains('.uvol')) {
       console.log('Dracosis volumetric file detected')
       node = new VolumetricNode(this)
-      uploadFileType = UploadFileTypes.Volumetric
+      uploadFileType = UploadFileType.Volumetric
       this.getSpawnPosition(node.position)
       this.addObject(node, parent, before)
     } else {
       node = new LinkNode(this)
       this.getSpawnPosition(node.position)
       node.href = url
-      uploadFileType = UploadFileTypes.Link
+      uploadFileType = UploadFileType.Link
       this.addObject(node, parent, before)
     }
     this.api.filesToUpload[name] = {

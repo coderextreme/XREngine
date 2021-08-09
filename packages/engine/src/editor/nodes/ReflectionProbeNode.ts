@@ -15,7 +15,7 @@ import {
   WebGLCubeRenderTarget
 } from 'three'
 import { FilesToUpload } from '../../../../client-core/src/world/components/editor/Api'
-import { UploadFileTypes } from '../../../../client-core/src/world/components/editor/assets/FileBrowserSourcePanel'
+import { UploadFileType } from '../../../../client-core/src/world/components/editor/assets/FileBrowserSourcePanel'
 import EditorNodeMixin from './EditorNodeMixin'
 import { envmapPhysicalParsReplace, worldposReplace } from './helper/BPCEMShader'
 import CubemapCapturer from './helper/CubemapCapturer'
@@ -213,7 +213,7 @@ export default class ReflectionProbeNode extends EditorNodeMixin(Object3D) {
       file_id: fileId,
       file_token: fileToken,
       file_name: 'ReflectionProbe Bake',
-      file_type: UploadFileTypes.Image
+      file_type: UploadFileType.Image
     }
   }
 

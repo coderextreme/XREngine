@@ -8,7 +8,7 @@ import { ProgressDialog } from './dialogs/ProgressDialog'
 import PublishDialog from './dialogs/PublishDialog'
 import PublishedSceneDialog from './dialogs/PublishedSceneDialog'
 import i18n from 'i18next'
-import { UploadFileTypes } from './assets/FileBrowserSourcePanel'
+import { UploadFileType } from './assets/FileBrowserSourcePanel'
 
 const resolveUrlCache = new Map()
 const resolveMediaCache = new Map()
@@ -90,7 +90,7 @@ export type FilesToUpload = {
     file_id: string
     file_token: string
     file_name: string
-    file_type: UploadFileTypes
+    file_type: UploadFileType
   }
 }
 

@@ -8,7 +8,7 @@ import { withEditor } from '../contexts/EditorContext'
  * @author Abhishek Pathak
  * @extends Component
  */
-export enum UploadFileTypes {
+export enum UploadFileType {
   'Image',
   'Model',
   'Vedio',
@@ -39,11 +39,23 @@ class FileBrowserSourcePanel extends Component {
     editor.removeListener('fileUploaded', this.onFileUploaded)
   }
 
+  renderUploadFiles(files) {
+    const type = UploadFileType.Image
+    switch (type) {
+      case UploadFileType.Image:
+        console.log('Image Type Detected')
+        break
+      default:
+        console.log('File Type Error')
+        break
+    }
+  }
   //rendering editor views for customization of element properties
   render() {
     const editor = (this.props as any).editor
     const lis = (editor.api as Api).filesToUpload
     console.log('List Present is:' + JSON.stringify(lis))
+
     return <div>This is the File Browser Panel</div>
   }
 }
