@@ -8,6 +8,7 @@ import { ProgressDialog } from './dialogs/ProgressDialog'
 import PublishDialog from './dialogs/PublishDialog'
 import PublishedSceneDialog from './dialogs/PublishedSceneDialog'
 import i18n from 'i18next'
+import { UploadFileTypes } from './assets/FileBrowserSourcePanel'
 
 const resolveUrlCache = new Map()
 const resolveMediaCache = new Map()
@@ -84,6 +85,15 @@ function guessContentType(url): string {
   return CommonKnownContentTypes[extension]
 }
 
+export type FilesToUpload = {
+  [key: string]: {
+    file_id: string
+    file_token: string
+    file_name: string
+    file_type: UploadFileTypes
+  }
+}
+
 /**
  * Api class contains functions to perform common operations.
  *
@@ -95,7 +105,7 @@ export class Api extends EventEmitter {
   projectDirectoryPath: string
   maxUploadSize: number
   props: any
-  filesToUpload: {}
+  filesToUpload: FilesToUpload
   currentProjectID: string
 
   /**

@@ -14,6 +14,8 @@ import {
   Vector3,
   WebGLCubeRenderTarget
 } from 'three'
+import { FilesToUpload } from '../../../../client-core/src/world/components/editor/Api'
+import { UploadFileTypes } from '../../../../client-core/src/world/components/editor/assets/FileBrowserSourcePanel'
 import EditorNodeMixin from './EditorNodeMixin'
 import { envmapPhysicalParsReplace, worldposReplace } from './helper/BPCEMShader'
 import CubemapCapturer from './helper/CubemapCapturer'
@@ -206,9 +208,12 @@ export default class ReflectionProbeNode extends EditorNodeMixin(Object3D) {
       file_id: fileId,
       meta: { access_token: fileToken }
     } = value
-    this.editor.api.filesToUpload[this.ownedFileIdentifier] = {
+    const filesToUpload = this.editor.api.filesToUpload as FilesToUpload
+    filesToUpload[this.ownedFileIdentifier] = {
       file_id: fileId,
-      file_token: fileToken
+      file_token: fileToken,
+      file_name: 'ReflectionProbe Bake',
+      file_type: UploadFileTypes.Image
     }
   }
 
