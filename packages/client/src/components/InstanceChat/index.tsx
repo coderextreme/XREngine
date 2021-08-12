@@ -220,7 +220,6 @@ const InstanceChat = (props: Props): any => {
                 <span className={styles.mesg} onClick={() => hideShowMessagesContainer()}>
                   <img src={MessageSvg} alt="message"></img>
                 </span>
-                {/* <span className={styles.chat}onClick={() => hideShowMessagesContainer()} ><SmsIcon fontSize="small"/></span> */}
               </div>
               <TextField
                 className={styles.messageFieldContainer}
@@ -285,7 +284,6 @@ const InstanceChat = (props: Props): any => {
             </span>
             {/* <Fab className="openChat" color="primary" onClick={() => hideShowMessagesContainer()}>
               <MessageIcon />
-              <img src={Chat} alt=""></img>
               Chat
             </Fab> */}
           </Badge>
