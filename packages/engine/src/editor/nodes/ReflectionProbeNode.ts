@@ -15,7 +15,7 @@ import {
   WebGLCubeRenderTarget
 } from 'three'
 import { FilesToUpload } from '../../../../client-core/src/world/components/editor/Api'
-import { UploadFileType } from '../../../../client-core/src/world/components/editor/assets/FileBrowserSourcePanel'
+import { UploadFileType } from '../../../../client-core/src/world/components/editor/assets/sources/MyAssetsSource'
 import EditorNodeMixin from './EditorNodeMixin'
 import { envmapPhysicalParsReplace, worldposReplace } from './helper/BPCEMShader'
 import CubemapCapturer from './helper/CubemapCapturer'

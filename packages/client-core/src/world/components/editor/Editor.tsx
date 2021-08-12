@@ -89,7 +89,7 @@ import {
 import { Config } from '../../../helper'
 import Api from './Api'
 import AssetManifestSource from './assets/AssetManifestSource'
-import { UploadFileType } from './assets/FileBrowserSourcePanel'
+import { UploadFileType } from './assets/sources/MyAssetsSource'
 import { loadEnvironmentMap } from './EnvironmentMap'
 
 const tempMatrix1 = new Matrix4()

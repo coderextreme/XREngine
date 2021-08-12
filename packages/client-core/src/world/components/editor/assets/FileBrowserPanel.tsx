@@ -6,88 +6,9 @@ import { EditorContext } from '../contexts/EditorContext'
 import AssetDropZone from './AssetDropZone'
 // @ts-ignore
 import styles from './styles.module.scss'
-
-/**
- * AssetsPanelToolbarContainer used as container element for tools like search input.
- *
- * @author Robert Long
- * @type {Styled component}
- */
-const AssetsPanelToolbarContainer = (styled as any).div`
-  display: flex;
-  min-height: 32px;
-  background-color: ${(props) => props.theme.toolbar};
-  align-items: center;
-  padding: 0 8px;
-  justify-content: space-between;
-  border-bottom: 1px solid ${(props) => props.theme.panel};
-`
-
-/**
- * AssetPanelToolbarContent used to provide styles toolbar content.
- *
- * @author Robert Long
- * @type {Styled component}
- */
-export const AssetPanelToolbarContent = (styled as any)(Row)`
-  flex: 1;
-  align-items: flex-end;
-
-  & > * {
-    margin-left: 16px;
-  }
-`
-
-/**
- * AssetsPanelToolbar used to create view elements for toolbar on asset penal.
- *
- * @author Robert Long
- * @param       {string} title    [contains the title for toolbar]
- * @param       {node} children
- * @param       {any} rest
- * @constructor
- */
-export function AssetsPanelToolbar({ title, children, ...rest }) {
-  return (
-    <AssetsPanelToolbarContainer {...rest}>
-      <div>{title}</div>
-      <AssetPanelToolbarContent>{children}</AssetPanelToolbarContent>
-    </AssetsPanelToolbarContainer>
-  )
-}
-
-/**
- * Declairing propTypes for AssetsPanelToolbar.
- *
- * @author Robert Long
- * @type {Object}
- */
-AssetsPanelToolbar.propTypes = {
-  title: PropTypes.string,
-  children: PropTypes.node
-}
-
-/**
- * AssetsPanelColumn
- *
- * @author Robert Long
- * @type {Styled component}
- */
-const AssetsPanelColumn = (styled as any)(Column)`
-  max-width: 175px;
-  border-right: 1px solid ${(props) => props.theme.border};
-`
-
-/**
- * AssetPanelContentContainer container element for asset panel.
- *
- * @author Robert Long
- * @type {Styled component}
- * */
-export const AssetPanelContentContainer = (styled as any)(Row)`
-  flex: 1;
-  overflow: hidden;
-`
+import { useAssetSearch } from './useAssetSearch'
+import { AssetPanelContentContainer } from './AssetsPanel'
+import AssetGrid from './AssetGrid'
 
 /**
  * getSources used to get sources out of editor and filter sources on the basis of requiresAuthentication or isAuthenticated.
@@ -102,12 +23,12 @@ function getSources(editor) {
 }
 
 /**
- * AssetsPanel used to render view for AssetsPanel.
- *
- * @author Robert Long
+ * FileBrowserPanel used to render view for AssetsPanel.
+ * @author Abhishek Pathak
  * @constructor
  */
-export default function AssetsPanel() {
+
+export default function FileBrowserPanel() {
   //initializing editor with EditorContext
   const editor = useContext(EditorContext)
 
@@ -115,7 +36,7 @@ export default function AssetsPanel() {
   const [sources, setSources] = useState(getSources(editor))
 
   //initializing selectedSource as the first element of sources array
-  const [selectedSource, setSelectedSource] = useState(sources.length > 0 ? sources[0] : null)
+  const [selectedSource, setSelectedSource] = useState(sources.length > 0 ? sources[1] : null)
   const SourceComponent = selectedSource && selectedSource.component
 
   useEffect(() => {
@@ -168,30 +89,25 @@ export default function AssetsPanel() {
   //initializing saved state on the bases of  selected source
   const savedState = savedSourceState[selectedSource.id] || {}
 
-  //creating view for asset penal
+  const { params, setParams, isLoading, loadMore, hasMore, results } = useAssetSearch(selectedSource)
+
+  const onSelect = () => {
+    console.log('On Selected')
+  }
+
   return (
-    <AssetsPanelContainer id="assets-panel" className={styles.assetsPanel}>
-      {/* @ts-ignore */}
-      {/* <AssetsPanelColumn flex>
-        <AssetsPanelToolbar title="Assets" />
-        <List>
-          {sources.map(source => (
-            <ListItem key={source.id} onClick={() => setSelectedSource(source)} selected={selectedSource === source}>
-              {source.name}
-            </ListItem>
-          ))}
-        </List>
-      </AssetsPanelColumn> */}
+    <AssetsPanelContainer id="file-browser-panel" className={styles.assetsPanel}>
       <Column flex>
-        {SourceComponent && (
-          <SourceComponent
-            key={selectedSource.id}
+        <AssetPanelContentContainer>
+          <AssetGrid
             source={selectedSource}
-            editor={editor}
-            savedState={savedState}
-            setSavedState={setSavedState}
+            items={results}
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            onSelect={onSelect}
+            isLoading={false}
           />
-        )}
+        </AssetPanelContentContainer>
       </Column>
       <AssetDropZone />
     </AssetsPanelContainer>

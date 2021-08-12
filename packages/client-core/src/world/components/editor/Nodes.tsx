@@ -27,7 +27,7 @@ import ReflectionProbeNode from '@xrengine/engine/src/editor/nodes/ReflectionPro
 import SplineNode from '@xrengine/engine/src/editor/nodes/SplineNode'
 import CloudNode from '@xrengine/engine/src/editor/nodes/CloudNode'
 import ElementsSource from './assets/sources/ElementsSource'
-import MyAssetsSource from './assets/sources/MyAssetsSource'
+import { MyAssetsSource } from './assets/sources/MyAssetsSource'
 import Editor from './Editor'
 import AmbientLightNodeEditor from './properties/AmbientLightNodeEditor'
 import AudioNodeEditor from './properties/AudioNodeEditor'

@@ -1,5 +1,4 @@
 import { BaseSource } from './index'
-import { ItemTypes } from '../../dnd'
 import UploadSourcePanel from '../UploadSourcePanel'
 import ModelNode from '@xrengine/engine/src/editor/nodes/ModelNode'
 import VideoNode from '@xrengine/engine/src/editor/nodes/VideoNode'
@@ -8,18 +7,35 @@ import AudioNode from '@xrengine/engine/src/editor/nodes/AudioNode'
 import { AcceptsAllFileTypes } from '../fileTypes'
 import i18n from 'i18next'
 import Editor from '../../Editor'
-const assetTypeToNode = {
-  model: ModelNode,
-  image: ImageNode,
-  video: VideoNode,
-  audio: AudioNode
+
+/**
+ * @author Abhishek Pathak
+ */
+
+export enum UploadFileType {
+  'NativeFile',
+  'Model',
+  'Image',
+  'Video',
+  'Audio',
+  'Volumetric',
+  'Element'
 }
-const assetTypeToItemType = {
-  model: ItemTypes.Model,
-  image: ItemTypes.Image,
-  video: ItemTypes.Video,
-  audio: ItemTypes.Audio
-}
+
+/**
+ * @author Abhishek Pathak
+ */
+export const UploadFileTypeToNode = new Map<number, Object>([
+  [UploadFileType.Audio, AudioNode],
+  [UploadFileType.Video, VideoNode],
+  [UploadFileType.Image, ImageNode],
+  [UploadFileType.Model, ModelNode]
+])
+
+/**
+ * @author Abhishek Pathak
+ */
+
 export class MyAssetsSource extends BaseSource {
   component: typeof UploadSourcePanel
   editor: Editor
@@ -57,7 +73,7 @@ export class MyAssetsSource extends BaseSource {
     this.emit('resultsChanged')
   }
   async search(params, cursor, abortSignal) {
-    const { results, suggestions, nextCursor } = await this.editor.api.searchMedia(
+    const { results } = await this.editor.api.searchMedia(
       this.id,
       {
         query: params.query,
@@ -66,21 +82,27 @@ export class MyAssetsSource extends BaseSource {
       cursor,
       abortSignal
     )
+    //console.log("Returned Item"+JSON.stringify(returned))
     return {
       results: results.map((result) => {
-        const thumbnailUrl = result && result.images && result.images.preview && result.images.preview.url
-        const nodeClass = assetTypeToNode[result.type]
-        const iconComponent = thumbnailUrl
-          ? null
-          : this.editor.nodeEditors.get(nodeClass).WrappedComponent
-          ? this.editor.nodeEditors.get(nodeClass).WrappedComponent.iconComponent
-          : this.editor.nodeEditors.get(nodeClass).iconComponent
+        const thumbnailUrl = 'url' //result && result.images && result.images.preview && result.images.preview.url
+        const nodeClass = UploadFileTypeToNode.get(UploadFileType.Model) //result.type]
+        // const iconComponent = thumbnailUrl
+        //   ? null
+        //   : this.editor.nodeEditors.get(nodeClass).WrappedComponent
+        //   ? this.editor.nodeEditors.get(nodeClass).WrappedComponent.iconComponent
+        //   : this.editor.nodeEditors.get(nodeClass).iconComponent
+
+        const iconComponent = this.editor.nodeEditors.get(nodeClass).iconComponent
+        const ownedFiles = result.ownedFileIds
+
         return {
-          id: result.id,
+          project: result,
+          id: 'result.id',
           thumbnailUrl,
           iconComponent,
           label: result.name,
-          type: assetTypeToItemType[result.type],
+          type: 'UploadFileType.Model',
           url: result.url,
           nodeClass,
           initialProps: {
@@ -89,10 +111,9 @@ export class MyAssetsSource extends BaseSource {
           }
         }
       }),
-      suggestions,
-      nextCursor,
-      hasMore: !!nextCursor
+      suggestions: null,
+      nextCursor: null,
+      hasMore: false //!!nextCursor
     }
   }
 }
-export default MyAssetsSource

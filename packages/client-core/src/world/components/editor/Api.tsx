@@ -8,7 +8,7 @@ import { ProgressDialog } from './dialogs/ProgressDialog'
 import PublishDialog from './dialogs/PublishDialog'
 import PublishedSceneDialog from './dialogs/PublishedSceneDialog'
 import i18n from 'i18next'
-import { UploadFileType } from './assets/FileBrowserSourcePanel'
+import { UploadFileType } from './assets/sources/MyAssetsSource'
 
 const resolveUrlCache = new Map()
 const resolveMediaCache = new Map()
@@ -85,6 +85,10 @@ function guessContentType(url): string {
   return CommonKnownContentTypes[extension]
 }
 
+/**
+ * @author Abhishek Pathak
+ */
+
 export type FilesToUpload = {
   [key: string]: {
     file_id: string
@@ -101,6 +105,7 @@ export type FilesToUpload = {
  */
 export class Api extends EventEmitter {
   serverURL: string
+
   apiURL: string
   projectDirectoryPath: string
   maxUploadSize: number
@@ -373,6 +378,7 @@ export class Api extends EventEmitter {
    * searchMedia function to search media on the basis of provided params.
    *
    * @author Robert Long
+   * @author Abhishek Pathak
    * @param  {any}  source
    * @param  {any}  params
    * @param  {any}  cursor
@@ -428,6 +434,7 @@ export class Api extends EventEmitter {
 
     const json = await resp.json()
 
+    console.log('Json Returned is:' + JSON.stringify(json))
     if (signal.aborted) {
       const error = new Error(i18n.t('editor:errors.mediaSearchAborted')) as any
       error['aborted'] = true
@@ -446,7 +453,7 @@ export class Api extends EventEmitter {
       })
 
     return {
-      results: thumbnailedEntries ? thumbnailedEntries : [],
+      results: json?.projects || [],
       suggestions: json.suggestions,
       nextCursor: json.meta?.next_cursor
     }
@@ -976,6 +983,7 @@ export class Api extends EventEmitter {
    * upload used to upload image as blob data.
    *
    * @author Robert Long
+   * @author Abhishek Pathak
    * @param  {any}  blob
    * @param  {any}  onUploadProgress
    * @param  {any}  signal
@@ -1131,6 +1139,7 @@ export class Api extends EventEmitter {
    * _uploadAsset used as api handler for the uploadAsset.
    *
    * @author Robert Long
+   * @author Abhishek Pathak
    * @param  {any}  endpoint
    * @param  {any}  editor
    * @param  {any}  file
@@ -1204,6 +1213,7 @@ export class Api extends EventEmitter {
    * deleteAsset used to delete existing asset using assetId.
    *
    * @author Robert Long
+   * @author Abhishek Pathak
    * @param  {any}  assetId
    * @return {Promise}               [true if deleted successfully else throw error]
    */
