@@ -1,8 +1,7 @@
-import mimeType from 'mime-types'
 import { Id, NullableId, Params, ServiceMethods } from '@feathersjs/feathers'
 import Paginated from '../../types/PageObject'
 import { Application } from '../../../declarations'
-import S3Provider from '../../media/storageprovider/s3.storage'
+import StorageProvider from '../../media/storageprovider/storageprovider'
 import { assembleScene, populateAvatar, populateScene, uploadAvatar } from './content-pack-helper'
 import config from '../../appconfig'
 import axios from 'axios'
@@ -10,7 +9,7 @@ import axios from 'axios'
 interface Data {}
 
 interface ServiceOptions {}
-const s3: any = new S3Provider()
+const storageProvider = new StorageProvider()
 const packRegex = /content-pack\/([a-zA-Z0-9_-]+)\/manifest.json/
 const thumbnailRegex = /([a-zA-Z0-9_-]+).jpeg/
 
@@ -49,39 +48,30 @@ export class ContentPack implements ServiceMethods<Data> {
 
   async find(params?: Params): Promise<any[] | Paginated<any>> {
     const result = await new Promise((resolve, reject) => {
-      s3.provider.listObjectsV2(
-        {
-          Bucket: s3.bucket,
-          Prefix: 'content-pack'
-        },
-        (err, data) => {
-          if (err) {
-            console.error(err)
-            reject(err)
-          } else {
-            resolve(data)
-          }
-        }
-      )
+        storageProvider.listObjects('content-pack')
+          .then(data => {
+              console.log('content-pack data', data)
+              resolve(data)
+          })
+          .catch(err => {
+              console.error(err)
+              reject(err)
+          })
     })
+    console.log('listObjects result', result)
     const manifests = (result as any).Contents.filter((result) => packRegex.exec(result.Key) != null)
-    const returned = await Promise.all(
+    return Promise.all(
       manifests.map(async (manifest) => {
         const manifestResult = (await new Promise((resolve, reject) => {
-          s3.provider.getObject(
-            {
-              Bucket: s3.bucket,
-              Key: manifest.Key
-            },
-            (err, data) => {
-              if (err) {
-                console.error(err)
-                reject(err)
-              } else {
-                resolve(data)
-              }
-            }
-          )
+          storageProvider.getObject(manifest.Key)
+              .then(data => {
+                  console.log('object data', data)
+                  resolve(data)
+              })
+              .catch(err => {
+                  console.error(err)
+                  reject(err)
+              })
         })) as any
         return {
           name: packRegex.exec(manifest.Key)[1],
@@ -90,7 +80,6 @@ export class ContentPack implements ServiceMethods<Data> {
         }
       })
     )
-    return returned
   }
 
   async get(id: Id, params?: Params): Promise<Data> {
@@ -104,25 +93,7 @@ export class ContentPack implements ServiceMethods<Data> {
 
     let uploadPromises = []
     const { scenes, contentPack, avatars } = data as any
-    await new Promise((resolve, reject) => {
-      s3.provider.getObjectAcl(
-        {
-          Bucket: s3.bucket,
-          Key: getManifestKey(contentPack)
-        },
-        (err, data) => {
-          if (err) {
-            if (err.code === 'NoSuchKey') resolve(null)
-            else {
-              console.error(err)
-              reject(err)
-            }
-          } else {
-            reject(new Error('Pack already exists'))
-          }
-        }
-      )
-    })
+    await storageProvider.checkObjectExistence(getManifestKey(contentPack))
     const body = {
       version: 1,
       avatars: [],
@@ -379,7 +350,7 @@ export class ContentPack implements ServiceMethods<Data> {
     await Promise.all(promises)
     if (body.version) body.version++
     else body.version = 1
-    await new Promise((resolve, reject) => {
+    if (config.server.storageProvider === 'aws') await new Promise((resolve, reject) => {
       s3.provider.putObject(
         {
           ACL: 'public-read',

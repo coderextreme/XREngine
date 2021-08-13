@@ -7,6 +7,7 @@ export default (): Hook => {
       delete context.data.uri
     }
 
+    console.log('context.data', context.data)
     delete context.result.uri
 
     const domain =

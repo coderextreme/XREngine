@@ -6,6 +6,7 @@ import { extension } from 'mime-types'
 
 export default (): Hook => {
   return async (context: HookContext): Promise<HookContext> => {
+    console.log('context in add-uri-to-file', context)
     if (!context.data.uri && context.params.file) {
       const file = context.params.file
       const uri = dauria.getBase64DataURI(file.buffer, file.mimetype)
@@ -14,18 +15,23 @@ export default (): Hook => {
 
     if (!context.data.id && _.has(context, 'params.uploadPath')) {
       const uploadPath = _.get(context, 'params.uploadPath')
+      const id = _.get(context, 'params.id')
+      console.log('add-uri-to-file uploadPath', uploadPath)
+      console.log('add-uri-to-file id', id)
       if (context.params.file.originalname === 'blob') {
         const fileExtenstion = String(extension(context.params.file.mimetype))
         context.data.id = uploadPath
           ? `${uploadPath as string}.${fileExtenstion}`
           : `${context.params.file.originalname as string}.${fileExtenstion}`
       } else {
-        context.data.id = uploadPath
+        context.data.id = uploadPath && id
+          ? path.join(uploadPath, id) : uploadPath
           ? path.join(uploadPath, context.params.file.originalname)
           : context.params.file.originalname
       }
     }
 
+    console.log('returned context.data.id', context.data.id)
     return context
   }
 }

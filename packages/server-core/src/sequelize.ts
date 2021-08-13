@@ -92,7 +92,10 @@ export default (app: Application): void => {
           return sequelize.query('SET FOREIGN_KEY_CHECKS = 1')
         })
         .then(async () => {
+          console.log('defaultContentPackURL', config.server.defaultContentPackURL)
+          console.log('urlRegex.test', urlRegex.test(config.server.defaultContentPackURL))
           if (forceRefresh === true && urlRegex.test(config.server.defaultContentPackURL)) {
+            console.log('Pulling content from default pack');
             try {
               await app.service('content-pack').update(null, {
                 manifestUrl: config.server.defaultContentPackURL
