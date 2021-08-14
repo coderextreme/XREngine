@@ -1,7 +1,3 @@
-/**
- * @author Abhishek Pathak <abhi.pathak401@gmail.com>
- */
-
 import {
   BoxBufferGeometry,
   BoxHelper,
@@ -32,6 +28,10 @@ export enum ReflectionProbeRefreshTypes {
   'EveryFrame'
 }
 
+/**
+ * @author Abhishek Pathak <abhi.pathak401@gmail.com>
+ */
+
 export type ReflectionProbeSettings = {
   probePosition: Vector3
   probePositionOffset?: Vector3
@@ -42,6 +42,10 @@ export type ReflectionProbeSettings = {
   envMapOrigin: string
   boxProjection: boolean
 }
+
+/**
+ * @author Abhishek Pathak <abhi.pathak401@gmail.com>
+ */
 
 export default class ReflectionProbeNode extends EditorNodeMixin(Object3D) {
   static nodeName = 'Reflection Probe'
@@ -204,6 +208,7 @@ export default class ReflectionProbeNode extends EditorNodeMixin(Object3D) {
       projectID
     )
     this.reflectionProbeSettings.envMapOrigin = value.origin
+    console.log('THe Reflection Probe Envamap URL is::' + value.origin)
     const {
       file_id: fileId,
       meta: { access_token: fileToken }
@@ -213,7 +218,8 @@ export default class ReflectionProbeNode extends EditorNodeMixin(Object3D) {
       file_id: fileId,
       file_token: fileToken,
       file_name: 'ReflectionProbe Bake',
-      file_type: UploadFileType.Image
+      file_type: UploadFileType.Image,
+      file_url: value.origin
     }
   }
 

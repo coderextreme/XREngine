@@ -95,6 +95,7 @@ export type FilesToUpload = {
     file_token: string
     file_name: string
     file_type: UploadFileType
+    file_url: string
   }
 }
 
@@ -434,7 +435,6 @@ export class Api extends EventEmitter {
 
     const json = await resp.json()
 
-    console.log('Json Returned is:' + JSON.stringify(json))
     if (signal.aborted) {
       const error = new Error(i18n.t('editor:errors.mediaSearchAborted')) as any
       error['aborted'] = true
@@ -527,7 +527,6 @@ export class Api extends EventEmitter {
     }
 
     Object.assign(project.filesToUpload, this.filesToUpload)
-
     const body = JSON.stringify({ project })
 
     const projectEndpoint = `${SERVER_URL}/project`
