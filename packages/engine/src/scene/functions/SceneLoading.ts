@@ -254,6 +254,7 @@ export class WorldScene {
       case 'box-collider':
         const boxColliderProps: BoxColliderProps = component.data
         createCollider(
+          entity,
           {
             userData: {
               type: 'box',
@@ -279,8 +280,9 @@ export class WorldScene {
         createParticleEmitterObject(entity, component.data)
         break
 
-      case 'cloud':
-        addObject3DComponent(entity, new Clouds(), component.data)
+      case 'clouds':
+        isClient && addObject3DComponent(entity, new Clouds(), component.data)
+        isClient && addComponent(entity, UpdatableComponent, {})
         break
 
       case 'ocean':
